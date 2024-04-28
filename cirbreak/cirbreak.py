@@ -86,6 +86,7 @@ class CirBreak:
         self.in_recovery = False
         self.consecutive = False
         self.consecutive = consecutive
+        self.message_error = ''
 
     def call(
         self,
@@ -97,7 +98,8 @@ class CirBreak:
         if self.is_open() and not self.attempt_recovery(
             replace_function, *args, **kwargs
         ):
-            raise Exception("Circuit breaker is open (failed).")
+            time_remaining = self.recovery_timeout - (time.time() - self.last_failure_time)
+            raise Exception(f"Circuit breaker is open (failed). Redirecting to another function. Time remaining: {time_remaining} seconds. Function Name: {function.__name__}. Error : {self.message_error}")
         try:
             result = function(*args, **kwargs)
             if self.consecutive:
@@ -105,6 +107,7 @@ class CirBreak:
             return result
         except Exception as e:
             self.record_failure()
+            self.message_error = str(e)
             raise e
 
     def is_open(self) -> bool:
