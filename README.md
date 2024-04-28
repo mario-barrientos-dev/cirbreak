@@ -1,4 +1,4 @@
-# CircuitBreaker
+# CirBreak
 
 This Python library provides a `circuit_breaker` decorator for implementing the circuit breaker pattern in your applications.
 
